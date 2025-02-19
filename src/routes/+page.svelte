@@ -644,36 +644,46 @@
                     </div>
                   </div>
                   <div class="template-actions" onclick={(e) => e.stopPropagation()}>
-                    <div class="template-actions-row">
+                    {#if editingTemplate === template.id}
                       <button 
-                        class="duplicate-button"
-                        onclick={() => duplicateTemplate(template.id)}
-                        title="Duplicate template"
-                      >
-                        <Copy size={20} strokeWidth={2} />
-                      </button>
-                      <button 
-                        class="delete-button"
-                        onclick={() => deleteWorkoutTemplate(template.id)}
-                        title="Delete template"
-                      >
-                        <Trash2 size={20} strokeWidth={2} />
-                      </button>
-                      <button 
-                        class="edit-button"
+                        class="save-button"
                         onclick={() => editTemplate(template.id)}
-                        title="Edit template"
+                        title="Save changes"
                       >
-                        <Edit size={20} strokeWidth={2} />
+                        <Save size={20} strokeWidth={2} />
                       </button>
-                    </div>
-                    <button 
-                      class="start-button"
-                      onclick={() => startWorkout(template.id)}
-                      title="Start workout"
-                    >
-                      <Play size={20} strokeWidth={2} />
-                    </button>
+                    {:else}
+                      <div class="template-actions-row">
+                        <button 
+                          class="duplicate-button"
+                          onclick={() => duplicateTemplate(template.id)}
+                          title="Duplicate template"
+                        >
+                          <Copy size={20} strokeWidth={2} />
+                        </button>
+                        <button 
+                          class="delete-button"
+                          onclick={() => deleteWorkoutTemplate(template.id)}
+                          title="Delete template"
+                        >
+                          <Trash2 size={20} strokeWidth={2} />
+                        </button>
+                        <button 
+                          class="edit-button"
+                          onclick={() => editTemplate(template.id)}
+                          title="Edit template"
+                        >
+                          <Edit size={20} strokeWidth={2} />
+                        </button>
+                      </div>
+                      <button 
+                        class="start-button"
+                        onclick={() => startWorkout(template.id)}
+                        title="Start workout"
+                      >
+                        <Play size={20} strokeWidth={2} />
+                      </button>
+                    {/if}
                   </div>
                 </div>
                 
@@ -1580,13 +1590,11 @@
   .history-list {
     display: grid;
     gap: 1rem;
-    margin-top: 1rem;
   }
   
   .template-card,
   .history-card {
     background: #f8f9fa;
-    padding: 1rem;
     border-radius: 0.25rem;
   }
   
@@ -1775,10 +1783,8 @@
   .template-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     cursor: pointer;
     padding: 0.75rem;
-    margin: -0.5rem;
     border-radius: 0.25rem;
     transition: background-color 0.2s;
     flex-wrap: wrap;
@@ -1869,6 +1875,7 @@
     padding: 0.5rem;
     border-radius: 0.25rem;
     font-size: 0.875rem;
+    text-align: center;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   }
   
@@ -2052,7 +2059,6 @@
   
   .set-editor {
     background: #f8f9fa;
-    padding: 1rem;
     border-radius: 0.25rem;
     transition: all 0.2s;
     width: 100%;
@@ -2531,11 +2537,6 @@
   }
 
   @media (max-width: 480px) {
-    .active-workout {
-      margin: 0 -0.25rem;
-      width: calc(100% + 0.5rem);
-      overflow-x: hidden;
-    }
 
     .exercise-card {
       margin: 1rem -0.25rem;
@@ -2625,9 +2626,7 @@
 
   @media (max-width: 480px) {
     .template-list {
-      margin: 0;
       width: 100%;
-      overflow-x: hidden;
     }
 
     .template-card {
@@ -2637,10 +2636,6 @@
       overflow: hidden;
     }
 
-    .template-header {
-      padding: 0.75rem;
-      margin: 0;
-    }
   }
 
   @media (max-width: 480px) {
@@ -2648,7 +2643,6 @@
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      padding: 0.75rem;
     }
 
     .set-content {
@@ -2701,10 +2695,6 @@
 
     .lift-select {
       width: 100%;
-    }
-
-    .set-editor {
-      padding: 0.75rem;
     }
 
     .set-content {
@@ -2796,5 +2786,37 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .save-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: #10b981;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(16,185,129,0.2);
+  }
+
+  .save-button:hover {
+    background: #059669;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(16,185,129,0.3);
+  }
+
+  main.dark .save-button {
+    background: #059669;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  main.dark .save-button:hover {
+    background: #047857;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   }
 </style>
