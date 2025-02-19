@@ -2519,4 +2519,38 @@
       height: 42px;
     }
   }
+
+  @media (max-width: 480px) {
+    .template-list {
+      margin: 0 -0.25rem;
+      width: calc(100% + 0.5rem);
+    }
+
+    .template-card {
+      margin: 0;
+      width: 100%;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+
+    .template-header {
+      padding: 0.75rem;
+      margin: 0;
+    }
+
+    .template-content {
+      margin: 0.75rem 0 0;
+      padding: 0.75rem 0 0;
+    }
+
+    .template-exercises {
+      margin: 0.75rem 0 0;
+    }
+
+    .template-exercise {
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+    }
+  }
 </style>
