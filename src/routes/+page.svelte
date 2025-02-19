@@ -23,10 +23,11 @@
   let currentWorkout = $state(null)
   let editingTemplate = $state(null)
   let expandedTemplate = $state(null)
+  let expandedExercises = $state(new Set())
   let newExerciseSets = $state([{ percentage: 70, reps: 8 }])
   let selectedExerciseLift = $state(null)
   
-  // Add new state variable for expanded history item
+  // Add toggle function for history expansion
   let expandedHistoryWorkout = $state(null)
   
   // Unit conversion functions
@@ -487,6 +488,16 @@
     workoutTemplates = [...workoutTemplates, newTemplate]
     saveData()
   }
+  
+  // Toggle exercise expansion
+  function toggleExercise(exerciseId) {
+    if (expandedExercises.has(exerciseId)) {
+      expandedExercises.delete(exerciseId)
+    } else {
+      expandedExercises.add(exerciseId)
+    }
+    expandedExercises = new Set(expandedExercises) // Trigger reactivity
+  }
 </script>
 
 <main class:dark={$darkMode}>
@@ -512,18 +523,18 @@
   
   <div class="unit-toggle">
     <div class="toggle-container">
-      <button 
-        class="unit-button {useKilograms ? 'active' : ''}" 
+    <button 
+      class="unit-button {useKilograms ? 'active' : ''}" 
         onclick={toggleUnits}
-      >
-        kg
-      </button>
-      <button 
-        class="unit-button {!useKilograms ? 'active' : ''}"
+    >
+      kg
+    </button>
+    <button 
+      class="unit-button {!useKilograms ? 'active' : ''}"
         onclick={toggleUnits}
-      >
-        lbs
-      </button>
+    >
+      lbs
+    </button>
     </div>
   </div>
   
@@ -534,24 +545,28 @@
       <div class="input-list">
         {#each lifts as lift}
           <div class="input-group">
-            <label for={lift.id}>{lift.name}:</label>
-            <input
-              type="number"
-              id={lift.id}
-              placeholder="Enter weight"
-              value={maxes[lift.id] || ''}
-              oninput={(e) => updateMax(lift.id, e.target.value)}
-              min="0"
-              step="2.5"
-            />
-            <span class="unit-label">{useKilograms ? 'kg' : 'lbs'}</span>
-            <button
-              class="view-button"
-              onclick={() => selectLift(lift.id)}
-              title="View percentages"
-            >
-              <Eye size={20} strokeWidth={2} />
-            </button>
+            <label for={lift.id}>{lift.name}</label>
+            <div class="input-row">
+              <div class="input-container">
+                <input
+                  type="number"
+                  id={lift.id}
+                  placeholder="Enter weight"
+                  value={maxes[lift.id] || ''}
+                  oninput={(e) => updateMax(lift.id, e.target.value)}
+                  min="0"
+                  step="2.5"
+                />
+                <span class="unit-label">{useKilograms ? 'kg' : 'lbs'}</span>
+              </div>
+              <button
+                class="view-button"
+                onclick={() => selectLift(lift.id)}
+                title="View percentages"
+              >
+                <Eye size={20} strokeWidth={2} />
+              </button>
+            </div>
           </div>
         {/each}
       </div>
@@ -670,60 +685,80 @@
                         {#each template.exercises as exercise}
                           {@const lift = lifts.find(l => l.id === exercise.liftId)}
                           <div class="template-exercise">
-                            <h6>{lift?.name}</h6>
-                            <div class="template-sets">
-                              {#each exercise.sets as set, setIndex}
-                                {#if editingTemplate === template.id}
-                                  <div class="set-editor">
-                                    <div class="set-number">Set {setIndex + 1}</div>
-                                    <div class="set-inputs">
-                                      <div class="input-with-label">
-                                        <input
-                                          type="number"
-                                          placeholder="Percentage"
-                                          value={set.percentage}
-                                          min="1"
-                                          max="100"
-                                          oninput={(e) => updateExistingSet(template.id, exercise.id, set.id, 'percentage', e.target.value)}
-                                        />
-                                        <span class="input-label">%</span>
-                                      </div>
-                                      <span class="multiply">×</span>
-                                      <div class="input-with-label">
-                                        <input
-                                          type="number"
-                                          placeholder="Reps"
-                                          value={set.reps}
-                                          min="1"
-                                          oninput={(e) => updateExistingSet(template.id, exercise.id, set.id, 'reps', e.target.value)}
-                                        />
-                                        <span class="input-label">reps</span>
-                                      </div>
-                                      <div class="set-actions">
-                                        <button
-                                          class="duplicate-set-button"
-                                          onclick={() => duplicateExistingSet(template.id, exercise.id, set.id)}
-                                          title="Duplicate set"
-                                        >
-                                          <Copy size={18} strokeWidth={2} />
-                                        </button>
-                                        <button
-                                          class="remove-set-button"
-                                          onclick={() => removeExistingSet(template.id, exercise.id, set.id)}
-                                          title="Remove set"
-                                        >
-                                          <X size={18} strokeWidth={2} />
-                                        </button>
+                            <div class="exercise-header" onclick={() => toggleExercise(exercise.id)}>
+                              <div class="exercise-title">
+                                <h6>{lift?.name}</h6>
+                                <div class="set-count">
+                                  {exercise.sets.length} set{exercise.sets.length === 1 ? '' : 's'}
+                                </div>
+                              </div>
+                              <button 
+                                class="expand-button"
+                                onclick={(e) => {
+                                  e.stopPropagation()
+                                  toggleExercise(exercise.id)
+                                }}
+                              >
+                                {expandedExercises.has(exercise.id) ? '−' : '+'}
+                              </button>
+                            </div>
+                            {#if expandedExercises.has(exercise.id)}
+                              <div class="template-sets" transition:slide>
+                                {#each exercise.sets as set, setIndex}
+                                  {#if editingTemplate === template.id}
+                                    <div class="set-editor">
+                                      <div class="set-number">Set {setIndex + 1}</div>
+                                      <div class="set-content">
+                                        <div class="set-inputs">
+                                          <div class="input-with-label">
+                                            <input
+                                              type="number"
+                                              placeholder="Percentage"
+                                              value={set.percentage}
+                                              min="1"
+                                              max="100"
+                                              oninput={(e) => updateExistingSet(template.id, exercise.id, set.id, 'percentage', e.target.value)}
+                                            />
+                                            <span class="input-label">%</span>
+                                          </div>
+                                          <span class="multiply">×</span>
+                                          <div class="input-with-label">
+                                            <input
+                                              type="number"
+                                              placeholder="Reps"
+                                              value={set.reps}
+                                              min="1"
+                                              oninput={(e) => updateExistingSet(template.id, exercise.id, set.id, 'reps', e.target.value)}
+                                            />
+                                            <span class="input-label">reps</span>
+                                          </div>
+                                        </div>
+                                        <div class="set-actions">
+                                          <button
+                                            class="duplicate-set-button"
+                                            onclick={() => duplicateExistingSet(template.id, exercise.id, set.id)}
+                                            title="Duplicate set"
+                                          >
+                                            <Copy size={18} strokeWidth={2} />
+                                          </button>
+                                          <button
+                                            class="remove-set-button"
+                                            onclick={() => removeExistingSet(template.id, exercise.id, set.id)}
+                                            title="Remove set"
+                                          >
+                                            <X size={18} strokeWidth={2} />
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                {:else}
-                                  <div class="template-set">
-                                    {set.percentage}% × {set.reps} reps
-                                  </div>
-                                {/if}
-                              {/each}
-                            </div>
+                                  {:else}
+                                    <div class="template-set">
+                                      {set.percentage}% × {set.reps} reps
+                                    </div>
+                                  {/if}
+                                {/each}
+                              </div>
+                            {/if}
                           </div>
                         {/each}
                       </div>
@@ -756,28 +791,30 @@
                                 {#each newExerciseSets as set, index}
                                   <div class="set-editor">
                                     <div class="set-number">Set {index + 1}</div>
-                                    <div class="set-inputs">
-                                      <div class="input-with-label">
-                                        <input
-                                          type="number"
-                                          placeholder="Percentage"
-                                          value={set.percentage}
-                                          min="1"
-                                          max="100"
-                                          oninput={(e) => updateSet(index, 'percentage', e.target.value)}
-                                        />
-                                        <span class="input-label">%</span>
-                                      </div>
-                                      <span class="multiply">×</span>
-                                      <div class="input-with-label">
-                                        <input
-                                          type="number"
-                                          placeholder="Reps"
-                                          value={set.reps}
-                                          min="1"
-                                          oninput={(e) => updateSet(index, 'reps', e.target.value)}
-                                        />
-                                        <span class="input-label">reps</span>
+                                    <div class="set-content">
+                                      <div class="set-inputs">
+                                        <div class="input-with-label">
+                                          <input
+                                            type="number"
+                                            placeholder="Percentage"
+                                            value={set.percentage}
+                                            min="1"
+                                            max="100"
+                                            oninput={(e) => updateSet(index, 'percentage', e.target.value)}
+                                          />
+                                          <span class="input-label">%</span>
+                                        </div>
+                                        <span class="multiply">×</span>
+                                        <div class="input-with-label">
+                                          <input
+                                            type="number"
+                                            placeholder="Reps"
+                                            value={set.reps}
+                                            min="1"
+                                            oninput={(e) => updateSet(index, 'reps', e.target.value)}
+                                          />
+                                          <span class="input-label">reps</span>
+                                        </div>
                                       </div>
                                       <div class="set-actions">
                                         <button
@@ -1037,8 +1074,15 @@
   }
   
   main.dark .set-number {
-    background: #334155;
-    color: #e5e5e5;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #666;
+    min-width: 3rem;
+    text-align: center;
+  }
+  
+  .dark .set-number {
+    color: #94a3b8;
   }
   
   .set-actions {
@@ -1068,13 +1112,24 @@
   }
 
   .view-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 8px;
     background: #4a90e2;
     color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 4px rgba(74,144,226,0.2);
   }
 
   .view-button:hover {
     background: #357abd;
+    transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(74,144,226,0.3);
   }
 
@@ -1343,44 +1398,85 @@
   
   .input-group {
     display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .input-group label {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .dark .input-group label {
+    color: #e5e5e5;
+  }
+  
+  .input-row {
+    display: flex;
     align-items: center;
     gap: 0.5rem;
-    flex-wrap: wrap;
+  }
+  
+  .input-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    flex: 1;
+  }
+  
+  .dark .input-container {
+    background: #333;
+    border-color: #404040;
+  }
+  
+  .input-container input {
+    width: 80px;
+    border: none;
+    padding: 0;
+    background: transparent;
+  }
+  
+  .input-container input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  
+  .dark .input-container input {
+    color: #e5e5e5;
   }
   
   @media (max-width: 480px) {
     .input-group {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.25rem;
-    }
-    
-    .input-group label {
-      min-width: auto;
-    }
-    
-    .input-group input {
       width: 100%;
     }
     
-    .view-button {
+    .input-row {
       width: 100%;
-      margin-top: 0.25rem;
+    }
+    
+    .input-container {
+      flex: 1;
+    }
+    
+    .input-container input {
+      width: 100%;
+      min-width: 0;
     }
   }
   
-  label {
-    min-width: 120px;
+  .unit-label {
+    font-size: 0.875rem;
+    color: #666;
     font-weight: 500;
+    margin-right: 0.5rem;
   }
   
-  input {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 0.25rem;
-    font-size: 1rem;
-    text-align: right;
+  .dark .unit-label {
+    color: #94a3b8;
   }
   
   input:focus {
@@ -1603,31 +1699,15 @@
   }
   
   .set-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    background: #10b981;
-    color: white;
-    border-radius: 0.5rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    font-size: 1rem;
-    flex-shrink: 0;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 
-      0 2px 4px rgba(16,185,129,0.2),
-      0 4px 8px rgba(16,185,129,0.1);
+    color: #666;
+    min-width: 3rem;
+    text-align: center;
   }
   
   .dark .set-number {
-    background: #059669;
-    color: white;
-    box-shadow: 
-      0 2px 4px rgba(0,0,0,0.2),
-      0 4px 8px rgba(0,0,0,0.1);
+    color: #94a3b8;
   }
   
   .set-row:hover .set-number {
@@ -1779,7 +1859,7 @@
   
   .template-sets {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.5rem;
     margin-top: 0.5rem;
   }
@@ -1988,7 +2068,31 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+  }
+  
+  @media (max-width: 480px) {
+    .set-inputs {
+      gap: 0.5rem;
+      width: 100%;
+    }
+    
+    .input-with-label {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .input-with-label input {
+      width: 100%;
+      min-width: 0;
+    }
+    
+    .set-actions {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.5rem;
+    }
   }
   
   .input-with-label {
@@ -2422,7 +2526,6 @@
 
   @media (max-width: 480px) {
     .template-card {
-      margin: 0 -0.25rem;
       width: calc(100% + 0.5rem);
     }
   }
@@ -2522,12 +2625,13 @@
 
   @media (max-width: 480px) {
     .template-list {
-      margin: 0 -0.25rem;
-      width: calc(100% + 0.5rem);
+      margin: 0;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     .template-card {
-      margin: 0;
+      margin: 0 0 1rem 0;
       width: 100%;
       border-radius: 0.75rem;
       overflow: hidden;
@@ -2537,20 +2641,160 @@
       padding: 0.75rem;
       margin: 0;
     }
+  }
 
-    .template-content {
-      margin: 0.75rem 0 0;
-      padding: 0.75rem 0 0;
-    }
-
-    .template-exercises {
-      margin: 0.75rem 0 0;
-    }
-
-    .template-exercise {
-      margin: 0.5rem 0;
+  @media (max-width: 480px) {
+    .set-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
       padding: 0.75rem;
-      border-radius: 0.5rem;
     }
+
+    .set-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .set-inputs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .input-with-label {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .input-with-label input {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .multiply {
+      margin: 0 0.25rem;
+      flex-shrink: 0;
+    }
+    
+    .set-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .duplicate-set-button,
+    .remove-set-button {
+      flex: 1;
+      height: 42px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .exercise-form {
+      gap: 1rem;
+    }
+
+    .form-group {
+      width: 100%;
+    }
+
+    .lift-select {
+      width: 100%;
+    }
+
+    .set-editor {
+      padding: 0.75rem;
+    }
+
+    .set-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .set-inputs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .input-with-label {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .input-with-label input {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .set-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-top: 0.5rem;
+    }
+
+    .editor-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .add-set-button,
+    .add-exercise-button {
+      width: 100%;
+    }
+  }
+
+  .template-exercise {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .exercise-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin: -0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+  }
+
+  .exercise-header:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .exercise-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .set-count {
+    color: #666;
+    font-size: 0.875rem;
+  }
+
+  main.dark .exercise-header:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  main.dark .set-count {
+    color: #94a3b8;
+  }
+
+  .template-sets {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 </style>
