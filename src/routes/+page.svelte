@@ -670,7 +670,26 @@
   main {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1rem 0.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    main {
+      padding: 0.5rem;
+    }
+    
+    h1 {
+      font-size: 1.75rem !important;
+      margin-bottom: 1rem !important;
+    }
+    
+    h2 {
+      font-size: 1.25rem !important;
+    }
+    
+    h3 {
+      font-size: 1.1rem !important;
+    }
   }
   
   h1 {
@@ -722,6 +741,28 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  @media (max-width: 480px) {
+    .input-group {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.25rem;
+    }
+    
+    .input-group label {
+      min-width: auto;
+    }
+    
+    .input-group input {
+      width: 100%;
+    }
+    
+    .view-button {
+      width: 100%;
+      margin-top: 0.25rem;
+    }
   }
   
   label {
@@ -771,8 +812,22 @@
   
   .percentages-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    .percentage-card {
+      padding: 0.75rem;
+    }
+    
+    .percentage {
+      font-size: 1rem;
+    }
+    
+    .weight {
+      font-size: 1.25rem;
+    }
   }
   
   .percentage-card {
@@ -899,9 +954,24 @@
   
   .sets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  @media (max-width: 480px) {
+    .set-card {
+      padding: 0.75rem;
+    }
+    
+    .set-target {
+      font-size: 1.1rem;
+    }
+    
+    .complete-set-button,
+    .finish-button {
+      padding: 0.75rem;
+      width: 100%;
+    }
   }
   
   .set-card {
@@ -948,14 +1018,55 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.75rem;
     margin: -0.5rem;
     border-radius: 0.25rem;
     transition: background-color 0.2s;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
   
-  .template-header:hover {
-    background: #e9ecef;
+  @media (max-width: 480px) {
+    .template-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .template-title {
+      width: 100%;
+    }
+    
+    .template-actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+    
+    .template-actions button {
+      flex: 1;
+      padding: 0.75rem;
+    }
+    
+    .set-inputs {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .input-with-label {
+      width: 100%;
+    }
+    
+    .input-with-label input {
+      width: 100%;
+    }
+    
+    .multiply {
+      align-self: center;
+      padding: 0.25rem;
+    }
+    
+    .remove-set-button {
+      align-self: center;
+    }
   }
   
   .template-title {
@@ -1033,7 +1144,19 @@
   .unit-toggle {
     display: flex;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    .toggle-container {
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .unit-button {
+      flex: 1;
+      padding: 0.75rem 1rem;
+    }
   }
   
   .toggle-container {
@@ -1104,9 +1227,26 @@
   
   .editor-section {
     background: white;
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  @media (max-width: 480px) {
+    .editor-section {
+      padding: 0.75rem;
+    }
+    
+    .editor-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .add-set-button,
+    .add-exercise-button {
+      width: 100%;
+      margin: 0;
+    }
   }
   
   .exercise-form {
@@ -1281,29 +1421,45 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.75rem;
     margin: -0.5rem;
     border-radius: 0.25rem;
     transition: background-color 0.2s;
-  }
-  
-  .history-header:hover {
-    background: #e9ecef;
-  }
-  
-  .history-actions {
-    display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
-    align-items: center;
   }
   
-  .history-details {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #ddd;
+  @media (max-width: 480px) {
+    .history-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .history-content {
+      width: 100%;
+    }
+    
+    .history-actions {
+      width: 100%;
+      justify-content: stretch;
+      gap: 0.5rem;
+    }
+    
+    .history-actions button {
+      flex: 1;
+      padding: 0.75rem;
+    }
+    
+    .workout-summary {
+      grid-template-columns: 1fr;
+    }
+    
+    .history-sets {
+      grid-template-columns: 1fr;
+    }
   }
   
-  .workout-summary {
+  .history-content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
