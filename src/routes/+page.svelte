@@ -629,27 +629,29 @@
                     </div>
                   </div>
                   <div class="template-actions" onclick={(e) => e.stopPropagation()}>
-                    <button 
-                      class="duplicate-button"
-                      onclick={() => duplicateTemplate(template.id)}
-                      title="Duplicate template"
-                    >
-                      <Copy size={20} strokeWidth={2} />
-                    </button>
-                    <button 
-                      class="delete-button"
-                      onclick={() => deleteWorkoutTemplate(template.id)}
-                      title="Delete template"
-                    >
-                      <Trash2 size={20} strokeWidth={2} />
-                    </button>
-                    <button 
-                      class="edit-button"
-                      onclick={() => editTemplate(template.id)}
-                      title="Edit template"
-                    >
-                      <Edit size={20} strokeWidth={2} />
-                    </button>
+                    <div class="template-actions-row">
+                      <button 
+                        class="duplicate-button"
+                        onclick={() => duplicateTemplate(template.id)}
+                        title="Duplicate template"
+                      >
+                        <Copy size={20} strokeWidth={2} />
+                      </button>
+                      <button 
+                        class="delete-button"
+                        onclick={() => deleteWorkoutTemplate(template.id)}
+                        title="Delete template"
+                      >
+                        <Trash2 size={20} strokeWidth={2} />
+                      </button>
+                      <button 
+                        class="edit-button"
+                        onclick={() => editTemplate(template.id)}
+                        title="Edit template"
+                      >
+                        <Edit size={20} strokeWidth={2} />
+                      </button>
+                    </div>
                     <button 
                       class="start-button"
                       onclick={() => startWorkout(template.id)}
@@ -1715,34 +1717,24 @@
     
     .template-actions {
       width: 100%;
-      justify-content: stretch;
-    }
-    
-    .template-actions button {
-      flex: 1;
-      padding: 0.75rem;
-    }
-    
-    .set-inputs {
+      display: flex;
       flex-direction: column;
       gap: 0.5rem;
     }
+
+    .template-actions-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
     
-    .input-with-label {
+    .template-actions button {
       width: 100%;
+      padding: 0.75rem;
     }
-    
-    .input-with-label input {
-      width: 100%;
-    }
-    
-    .multiply {
-      align-self: center;
-      padding: 0.25rem;
-    }
-    
-    .remove-set-button {
-      align-self: center;
+
+    .start-button {
+      margin-top: 0.25rem;
     }
   }
   
