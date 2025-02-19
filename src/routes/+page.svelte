@@ -957,25 +957,26 @@
   }
   
   :global(body.dark) {
-    background-color: #0f172a;
+    background-color: #000000;
   }
   
   main.dark {
     color: #e5e5e5;
+    background-color: #000000;
   }
   
   main.dark .card {
-    background: #1e293b;
+    background: #1a1a1a;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
   
   main.dark .exercise-card {
-    background: #1e293b;
+    background: #1a1a1a;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
   
   main.dark .set-card {
-    background: #334155;
+    background: #262626;
     color: #e5e5e5;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
@@ -995,16 +996,16 @@
   
   main.dark .template-card,
   main.dark .set-editor {
-    background: #1e293b;
+    background: #1a1a1a;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
   
   main.dark .template-exercise {
-    background: #334155;
+    background: #262626;
   }
   
   main.dark .template-set {
-    background: #475569;
+    background: #333333;
     color: #e5e5e5;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
@@ -1982,6 +1983,9 @@
     padding: 1rem;
     border-radius: 0.25rem;
     transition: all 0.2s;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   
   .set-editor:hover {
@@ -1992,6 +1996,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex-wrap: wrap;
   }
   
   .input-with-label {
@@ -2421,5 +2426,105 @@
   main.dark .duplicate-button:hover {
     background: #3b82f6;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+
+  @media (max-width: 480px) {
+    .template-card {
+      margin: 0 -0.25rem;
+      width: calc(100% + 0.5rem);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .active-workout {
+      margin: 0 -0.25rem;
+      width: calc(100% + 0.5rem);
+      overflow-x: hidden;
+    }
+
+    .exercise-card {
+      margin: 1rem -0.25rem;
+      padding: 0.75rem;
+      width: calc(100% + 0.5rem);
+      overflow-x: hidden;
+    }
+
+    .set-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem;
+    }
+
+    .set-number {
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+    }
+
+    .set-target {
+      width: 100%;
+    }
+
+    .set-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .set-actual {
+      width: 100%;
+      margin-right: 0;
+      text-align: left;
+    }
+
+    .complete-set-button {
+      width: 100%;
+    }
+
+    .edit-set-button {
+      width: 100%;
+      padding: 0.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .exercise-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .exercise-header h4 {
+      margin: 0;
+      width: 100%;
+    }
+
+    .add-set-button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .sets-list {
+      gap: 0.5rem;
+    }
+
+    .set-row {
+      margin: 0 -0.25rem;
+      width: calc(100% + 0.5rem);
+      border-radius: 0.5rem;
+    }
+
+    .set-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+    }
+
+    .remove-set-button {
+      width: 42px;
+      height: 42px;
+    }
   }
 </style>
