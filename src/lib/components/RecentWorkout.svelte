@@ -5,6 +5,18 @@
   
   const { workout, template, onDelete, onToggle, isExpanded, useKilograms } = $props();
   
+  const lifts = [
+    { name: 'Squat', id: 'squat' },
+    { name: 'Bench Press', id: 'bench' },
+    { name: 'Deadlift', id: 'deadlift' },
+    { name: 'Weighted Pullups', id: 'pullups' }
+  ];
+
+  function getLiftName(liftId) {
+    const lift = lifts.find(l => l.id === liftId);
+    return lift ? lift.name : 'Unknown Exercise';
+  }
+  
   function formatWeight(weight) {
     if (weight === '-') return '-';
     return `${weight}${useKilograms ? 'kg' : 'lbs'}`;
@@ -90,8 +102,10 @@
       
       <div class="exercises">
         {#each workout.exercises as exercise}
-          <div class="exercise-card">
-            <h5>{exercise.liftName}</h5>
+          <div class="exercise-card {exercise.isPeaking ? 'peaking' : ''}">
+            <h5 class:peaking={exercise.isPeaking}>
+              {getLiftName(exercise.liftId)}{exercise.isPeaking ? ' (Peaking)' : ''}
+            </h5>
             <div class="sets-grid">
               {#each exercise.sets as set}
                 <div class="set-card" class:completed={set.completed}>
@@ -309,11 +323,60 @@
     padding: 1.25rem;
     border-radius: 0.75rem;
     border: 1px solid #e5e5e5;
+    position: relative;
   }
   
   .dark .exercise-card {
     background: #1e293b;
     border-color: #334155;
+  }
+  
+  .exercise-card.peaking {
+    border: 2px solid #e11d48;
+  }
+  
+  .exercise-card.peaking::before {
+    content: 'PEAKING';
+    position: absolute;
+    top: -0.75rem;
+    right: 1rem;
+    background: #e11d48;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  
+  .dark .exercise-card.peaking {
+    border-color: #fb7185;
+  }
+  
+  .dark .exercise-card.peaking::before {
+    background: #fb7185;
+  }
+  
+  h5.peaking {
+    color: #e11d48;
+    font-weight: 600;
+    position: relative;
+  }
+  
+  .dark h5.peaking {
+    color: #fb7185;
+  }
+  
+  h5.peaking::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.3;
+    border-radius: 1px;
   }
   
   h5 {
@@ -358,6 +421,30 @@
   .dark .set-card.completed {
     background: #064e3b;
     border: 1px solid #059669;
+  }
+  
+  .set-exercise {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  
+  .dark .set-exercise {
+    color: #f3f4f6;
+    border-color: #334155;
+  }
+  
+  .set-card.completed .set-exercise {
+    color: #059669;
+    border-color: #86efac;
+  }
+  
+  .dark .set-card.completed .set-exercise {
+    color: #4ade80;
+    border-color: #059669;
   }
   
   .set-planned {

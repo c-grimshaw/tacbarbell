@@ -162,6 +162,7 @@
           exercises: [...template.exercises, {
             id: crypto.randomUUID(),
             liftId: selectedExerciseLift,
+            isPeaking: selectedExerciseIsPeaking,
             sets: newExerciseSets.map(({ percentage, reps }) => 
               createExerciseSet(selectedExerciseLift, percentage, reps)
             )
@@ -173,6 +174,7 @@
     
     // Reset exercise creation state
     selectedExerciseLift = null
+    selectedExerciseIsPeaking = false
     newExerciseSets = [{ percentage: 70, reps: 5 }]
     saveData()
   }
@@ -498,6 +500,8 @@
     }
     expandedExercises = new Set(expandedExercises) // Trigger reactivity
   }
+
+  let selectedExerciseIsPeaking = $state(false)
 </script>
 
 <main class:dark={$darkMode}>
@@ -697,7 +701,9 @@
                           <div class="template-exercise">
                             <div class="exercise-header" onclick={() => toggleExercise(exercise.id)}>
                               <div class="exercise-title">
-                                <h6>{lift?.name}</h6>
+                                <h6 class:peaking={exercise.isPeaking}>
+                                  {lift?.name}{exercise.isPeaking ? ' (Peaking)' : ''}
+                                </h6>
                                 <div class="set-count">
                                   {exercise.sets.length} set{exercise.sets.length === 1 ? '' : 's'}
                                 </div>
@@ -793,6 +799,13 @@
                                   <option value={lift.id}>{lift.name}</option>
                                 {/each}
                               </select>
+                              <label class="peaking-checkbox">
+                                <input
+                                  type="checkbox"
+                                  bind:checked={selectedExerciseIsPeaking}
+                                />
+                                <span>Peaking Exercise</span>
+                              </label>
                             </div>
                             
                             <div class="sets-editor">
@@ -909,9 +922,9 @@
           
           {#each currentWorkout.exercises as exercise}
             {@const lift = lifts.find(l => l.id === exercise.liftId)}
-            <div class="exercise-card">
+            <div class="exercise-card {exercise.isPeaking ? 'peaking' : ''}">
               <div class="exercise-header">
-                <h4>{lift?.name}</h4>
+                <h4>{lift?.name}{exercise.isPeaking ? ' (Peaking)' : ''}</h4>
               </div>
               <div class="sets-list">
                 {#each exercise.sets as set, index}
@@ -2818,5 +2831,87 @@
   main.dark .save-button:hover {
     background: #047857;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+
+  .peaking-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .peaking-checkbox input {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+  }
+
+  .peaking-checkbox span {
+    color: #666;
+    font-size: 0.875rem;
+  }
+
+  .dark .peaking-checkbox span {
+    color: #94a3b8;
+  }
+
+  h6.peaking {
+    color: #e11d48;
+    font-weight: 600;
+    position: relative;
+  }
+
+  main.dark h6.peaking {
+    color: #fb7185;
+  }
+
+  h6.peaking::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.3;
+    border-radius: 1px;
+  }
+
+  .exercise-card.peaking {
+    border: 2px solid #e11d48;
+    position: relative;
+  }
+
+  .exercise-card.peaking::before {
+    content: 'PEAKING';
+    position: absolute;
+    top: -0.75rem;
+    right: 1rem;
+    background: #e11d48;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  main.dark .exercise-card.peaking {
+    border-color: #fb7185;
+  }
+
+  main.dark .exercise-card.peaking::before {
+    background: #fb7185;
+  }
+
+  .exercise-card.peaking h4 {
+    color: #e11d48;
+    font-weight: 600;
+  }
+
+  main.dark .exercise-card.peaking h4 {
+    color: #fb7185;
   }
 </style>
