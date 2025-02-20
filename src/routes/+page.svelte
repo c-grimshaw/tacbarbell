@@ -2552,17 +2552,13 @@
   @media (max-width: 480px) {
 
     .exercise-card {
-      margin: 1rem -0.25rem;
       padding: 0.75rem;
-      width: calc(100% + 0.5rem);
-      overflow-x: hidden;
     }
 
     .set-row {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.75rem;
-      padding: 0.75rem;
     }
 
     .set-number {
@@ -2620,8 +2616,6 @@
     }
 
     .set-row {
-      margin: 0 -0.25rem;
-      width: calc(100% + 0.5rem);
       border-radius: 0.5rem;
     }
 
